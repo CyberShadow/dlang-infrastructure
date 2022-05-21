@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -ueo pipefail
+
+# Hint: to debug, ssh and run: tail /var/log/cloud-init-output.log
+#set -x
+
+sudo apt-get update
+sudo apt-get install -y docker.io
+systemctl enable --now docker
+
+docker run \
+	--detach=true \
+	--restart=always \
+	--net=host \
+	--ulimit nofile=524288:524288 \
+	'library/nginx:latest@sha256:b495f952df67472c3598b260f4b2e2ba9b5a8b0af837575cf4369c95c8d8a215'

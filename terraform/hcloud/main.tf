@@ -11,7 +11,7 @@ provider "hcloud" {
 }
 
 locals {
-  github_users = ["CyberShadow", "ZombineDev"]
+  github_users = ["CyberShadow", "PetarKirov"]
 }
 
 data "http" "ssh_keys" {

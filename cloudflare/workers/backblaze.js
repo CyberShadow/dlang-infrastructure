@@ -9,7 +9,10 @@ addEventListener('fetch', event => {
 async function handleRequest(event) {
   // only allow get requests
   if (event.request.method !== 'GET') {
-    return new Response('Method not allowed', { status: 405 })
+    return new Response('Method not allowed', {
+        status: 405,
+        headers: { 'allowed': 'GET' }
+    })
   }
   // return a cached response if we have one
   const cache = caches.default

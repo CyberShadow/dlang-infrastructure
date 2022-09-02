@@ -11,7 +11,7 @@ async function handleRequest(event) {
   if (event.request.method !== 'GET') {
     return new Response('Method not allowed', {
         status: 405,
-        headers: { 'allowed': 'GET' }
+        headers: { 'allow': 'GET' }
     })
   }
   // return a cached response if we have one

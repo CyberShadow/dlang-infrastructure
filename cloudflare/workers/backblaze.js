@@ -1,6 +1,6 @@
 // Improved the script from this blog https://www.grahn.io/posts/2020-02-08-s3-vs-b2-static-web-hosting/
 // Backblaze Url
-const baseURL = "${{ secrets.backblazeBucketUrl }}"
+const baseURL = BACKBLAZE_BASE_URL
 
 addEventListener('fetch', event => {
   event.respondWith(handleRequest(event))

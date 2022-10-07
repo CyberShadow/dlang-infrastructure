@@ -20,7 +20,8 @@ async function handleRequest(event) {
   if (cachedResponse) {
     return cachedResponse
   }
-  
+
+  const headers = event.request.headers
   const parsedUrl = new URL(event.request.url)
   let path = parsedUrl.pathname
   const lastSegment = path.substring(path.lastIndexOf('/'))
@@ -30,15 +31,18 @@ async function handleRequest(event) {
   }
 
   // fetch content from B2
-  const response = await b2Fetch(path)
+  const response = await b2Fetch(path, headers)
   // all is well, return the response
   if (response.status < 400) {
-    event.waitUntil(cache.put(event.request, response.clone()))
+    // cache the response, does not block/await.
+    if (response.status != 206) {
+      event.waitUntil(cache.put(event.request, response.clone()))
+    }
     return response
   }
   else if (response.status == 404 && !lastSegment.endsWith('/')) {
     // file doesn't exist, check if it's really a folder
-    const fallback = await b2Fetch(path + '/index.html')
+    const fallback = await b2Fetch(path + '/index.html', headers)
     if (fallback.status < 400) {
       // Don't return found content, instead redirect
       return Response.redirect('https://' + parsedUrl.hostname + path + '/', 301)
@@ -50,12 +54,7 @@ async function handleRequest(event) {
   }
 }
 
-async function b2Fetch(path) {
-  const b2Response = await fetch(`${baseURL}${path}`)
-  // add some headers
-  const headers = {
-    'cache-control': 'public, max-age=86400',
-    'content-type': b2Response.headers.get('Content-Type')
-  }
-  return new Response(b2Response.body, { ...b2Response, headers })
+async function b2Fetch(path, headers) {
+  const b2Response = await fetch(`${baseURL}${path}`, { headers })
+  return new Response(b2Response.body, { ...b2Response })
 }
